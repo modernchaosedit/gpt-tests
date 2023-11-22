@@ -75,34 +75,60 @@
   }
 
   // Define a function to play sounds and create particles
-  function playQuantumSoundAndParticles(lifeStage, event) {
-    // Define scale sets for different life stages
-    const lifeStageScales = {
-      // [...]
-      // Your life stage scales go here
-      // Each life stage should have an array of scale arrays, volumeRange, and duration
-      // [...]
+  function playQuantumSound(lifeStage) {
+    // Ensure the audio context is started on a user gesture
+    Tone.start();
+  
+    // Define the configuration for each life stage
+    const lifeStageConfigs = {
+        'child': {
+            scale: ['C4', 'D4', 'E4', 'G4', 'A4'],
+            options: { oscillator: { type: 'sine' }, volume: -12 }
+        },
+        'lover': {
+            scale: ['C4', 'Eb4', 'G4', 'Bb4'],
+            options: { oscillator: { type: 'triangle' }, volume: -18 }
+        },
+        'partner': {
+            scale: ['D4', 'F#4', 'A4', 'C#5'],
+            options: { oscillator: { type: 'sawtooth' }, volume: -10 }
+        },
+        'philosopher': {
+            scale:['D4', 'F4', 'A4', 'C5'],
+            options: { oscillator: { type: 'sine' }, volume: -14 }
+        },
+        'adult': {
+            scale: ['E4', 'G#4', 'B4', 'C#5'],
+            options: { oscillator: { type: 'sawtooth' }, volume: -12 }
+        },
+        'wanderer': {
+            scale: ['E4', 'G4', 'B4', 'D5'],
+            options: { oscillator: { type: 'square' }, volume: -16 }
+        },
+        'artist': {
+            scale: ['A4', 'C5', 'E5', 'G5'],
+            options: { oscillator: { type: 'triangle' }, volume: -20 }
+        }
     };
 
-    // Get the lifeStage scales, volume range, and duration
-    const { scales, volumeRange, duration } = lifeStageScales[lifeStage];
-
-    // Choose a scale randomly
-    const scaleSet = scales[Math.floor(Math.random() * scales.length)];
-
-    // Create a synth
-    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-
-    // Randomize the volume
-    const volume = Math.random() * (volumeRange[1] - volumeRange[0]) + volumeRange[0];
-    synth.volume.value = volume;
-
-    // Play the notes of the chosen scale
-    scaleSet.forEach((note, index) => {
-      const time = Tone.now() + index * 0.25;
-      const noteDuration = duration[Math.floor(Math.random() * duration.length)];
-      synth.triggerAttackRelease(note, noteDuration, time);
+    // Get the configuration for the current life stage
+    const config = lifeStageConfigs[lifeStage];
+  
+    // Create a synthesizer and connect it to the main output
+    const synth = new Tone.PolySynth(Tone.Synth, config.options).toDestination();
+  
+    // Randomize the duration of the note
+    const durations = ['8n', '4n', '2n'];
+    const duration = durations[Math.floor(Math.random() * durations.length)];
+  
+    // Play a sequence of notes
+    config.scale.forEach((note, index) => {
+        synth.triggerAttackRelease(note, duration, Tone.now() + index * 0.5);
     });
+}
+
+// Add Event listeners to buttons as done previously
+// Add the createParticle function from earlier where indicated
 
     // Create a particle at the click location
     createParticle(event.clientX, event.clientY);
