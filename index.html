@@ -14,11 +14,7 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
         }
-        #buttons-container {
-            position: relative;
-            z-index: 1; /* Ensures buttons are clickable, above particles */
-        }
-        button {
+        #buttons-container button {
             margin: 5px;
             padding: 10px 20px;
             font-size: 16px;
@@ -62,19 +58,27 @@
 <div id="particle-container"></div>
 
 <script>
-  // Define a function to create and animate particles
-  function createParticle(x, y) {
+document.documentElement.addEventListener('mousedown', async () => {
+    await Tone.start();
+    console.log('Playback started successfully');
+});
+
+const lifeStageScales = {
+    // Life stage definitions as previously listed
+    // ...
+};
+
+ function createParticle(x, y) {
     const particleContainer = document.getElementById('particle-container');
     const particle = document.createElement('div');
     particle.classList.add('particle');
-    particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`; // Random color
-    const size = Math.random() * 10 + 5; // Random size between 5px and 15px
+    particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+    const size = Math.random() * 10 + 5; // Size between 5px and 15px
     particle.style.width = `${size}px`;
     particle.style.height = `${size}px`;
     particle.style.top = `${y - size / 2}px`;
     particle.style.left = `${x - size / 2}px`;
 
-    // Remove particle after animation ends
     particle.addEventListener('animationend', () => {
       particleContainer.removeChild(particle);
     });
@@ -82,75 +86,65 @@
     particleContainer.appendChild(particle);
   }
 
-  // Define a function to play sounds and create particles
-  function playQuantumSound(lifeStage) {
-    // Ensure the audio context is started on a user gesture
-    Tone.start();
-  
-    // Define the configuration for each life stage
-    const lifeStageConfigs = {
-        'child': {
-            scale: ['C4', 'D4', 'E4', 'G4', 'A4'],
-            options: { oscillator: { type: 'sine' }, volume: -12 }
-        },
-        'lover': {
-            scale: ['C4', 'Eb4', 'G4', 'Bb4'],
-            options: { oscillator: { type: 'triangle' }, volume: -18 }
-        },
-        'partner': {
-            scale: ['D4', 'F#4', 'A4', 'C#5'],
-            options: { oscillator: { type: 'sawtooth' }, volume: -10 }
-        },
-        'philosopher': {
-            scale:['D4', 'F4', 'A4', 'C5'],
-            options: { oscillator: { type: 'sine' }, volume: -14 }
-        },
-        'adult': {
-            scale: ['E4', 'G#4', 'B4', 'C#5'],
-            options: { oscillator: { type: 'sawtooth' }, volume: -12 }
-        },
-        'wanderer': {
-            scale: ['E4', 'G4', 'B4', 'D5'],
-            options: { oscillator: { type: 'square' }, volume: -16 }
-        },
-        'artist': {
-            scale: ['A4', 'C5', 'E5', 'G5'],
-            options: { oscillator: { type: 'triangle' }, volume: -20 }
-        }
-    };
 
-    // Get the configuration for the current life stage
-    const config = lifeStageConfigs[lifeStage];
-  
-    // Create a synthesizer and connect it to the main output
-    const synth = new Tone.PolySynth(Tone.Synth, config.options).toDestination();
-  
-    // Randomize the duration of the note
-    const durations = ['8n', '4n', '2n'];
-    const duration = durations[Math.floor(Math.random() * durations.length)];
-  
-    // Play a sequence of notes
-    config.scale.forEach((note, index) => {
-        synth.triggerAttackRelease(note, duration, Tone.now() + index * 0.5);
+  // Define the configurations for life stage sounds
+  const lifeStageScales = {
+    'child': {
+      scales: [['C4', 'E4', 'G4', 'C5'], ['E4', 'G4', 'C5', 'E5'], ['G4', 'C5', 'E5', 'G5']],
+      volumeRange: [-12, -6],
+      durations: ['8n', '4n']
+    },
+    'lover': {
+      scales: [['C4', 'Eb4', 'G4', 'Bb4'], ['Eb4', 'G4', 'Bb4', 'C5'], ['G4', 'Bb4', 'C5', 'Eb5']],
+      volumeRange: [-18, -12],
+      durations: ['8n', '4n', '2n']
+    },
+    'partner': {
+      scales: [['D4', 'F#4', 'A4', 'D5'], ['F#4', 'A4', 'D5', 'F#5'], ['A4', 'D5', 'F#5', 'A5']],
+      volumeRange: [-10, -4],
+      durations: ['16n', '8n', '4n'] },
+      
+    'philosopher': {
+      scales: [['D4', 'F4', 'A4', 'D5'], ['F4', 'A4', 'D5', 'F5'], ['A4', 'D5', 'F5', 'A5']],
+      volumeRange: [-14, -8],
+      durations: ['4n', '2n']
+    },
+    'adult': {
+      scales: [['E4', 'G#4', 'B4', 'E5'], ['G#4', 'B4', 'E5', 'G#5'], ['B4', 'E5', 'G#5', 'B5']],
+      volumeRange: [-12, -6],
+      durations: ['8n', '4n']
+    },
+    'wanderer': {
+      scales: [['E4', 'G4', 'B4', 'E5'], ['G4', 'B4', 'E5', 'G5'], ['B4', 'E5', 'G5', 'B5']],
+      volumeRange: [-16, -10],
+      durations: ['16n', '8n']
+    },
+    'artist': {
+      scales: [['A4', 'C5', 'E5', 'A5'], ['C5', 'E5', 'A5', 'C6'], ['E5', 'A5', 'C6', 'E6']],
+      volumeRange: [-20, -14],
+      durations: ['8n', '4n', '2n']
+    }
+  }; function playQuantumSound(lifeStage, event) {
+    const { scales, volumeRange, durations } = lifeStageScales[lifeStage];
+    const scale = scales[Math.floor(Math.random() * scales.length)];
+    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+    const volume = Math.random() * (volumeRange[1] - volumeRange[0]) + volumeRange[0];
+    synth.volume.value = volume;
+    
+    scale.forEach((note, index) => {
+      const duration = durations[Math.floor(Math.random() * durations.length)];
+      synth.triggerAttackRelease(note, duration, Tone.now() + index * 0.25);
     });
-}
 
-// Add Event listeners to buttons as done previously
-// Add the createParticle function from earlier where indicated
-
-    // Create a particle at the click location
-    createParticle(event.clientX, event.clientY);
+    // Create particle effect on sound play
+    const rect = event.target.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    createParticle(x, y);
   }
-
-  // Start audio context on user interaction
-  document.documentElement.addEventListener('mousedown', () => {
-    Tone.start();
-  });
-
-  // Add event listener to buttons
-  document.querySelectorAll('#buttons-container button').forEach(button => {
-    button.addEventListener('click', function(event) {
-      playQuantumSoundAndParticles(this.id, event);
+     document.querySelectorAll('#buttons-container button').forEach(button => {
+     button.addEventListener('click', function(event) {
+        playQuantumSound(this.id, event);
     });
   });
 </script>
