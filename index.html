@@ -25,26 +25,79 @@
 <body>
 
 <div id="buttons-container">
-    <button id="sound">Play Sound</button>
+    <button id="child">Child</button>
+    <button id="lover">Lover</button>
+    <button id="partner">Partner</button>
+    <button id="philosopher">Philosopher</button>
+    <button id="adult">Adult</button>
+    <button id="wanderer">Wanderer</button>
+    <button id="artist">Artist</button>
 </div>
 
 <script>
+  // Start the audio context after user interaction
   document.documentElement.addEventListener('mousedown', async () => {
     await Tone.start();
-    console.log('Audio context activated');
   });
 
-  // Simple function to play a C4 note for testing purposes
-  function playSound() {
-    const synth = new Tone.Synth().toDestination();
-    synth.triggerAttackRelease("C4", "8n");
+ const lifeStageScales = {
+  'child': {
+    scales: [['C4', 'E4', 'G4', 'C5'], ['E4', 'G4', 'C5', 'E5'], ['G4', 'C5', 'E5', 'G5']],
+    volumeRange: [-12, -6],
+    durations: ['8n', '4n']
+  },
+  'lover': {
+    scales: [['C4', 'Eb4', 'G4', 'Bb4'], ['Eb4', 'G4', 'Bb4', 'C5'], ['G4', 'Bb4', 'C5', 'Eb5']],
+    volumeRange: [-18, -12],
+    durations: ['8n', '4n', '2n']
+  },
+  'partner': {
+    scales: [['D4', 'F#4', 'A4', 'D5'], ['F#4', 'A4', 'D5', 'F#5'], ['A4', 'D5', 'F#5', 'A5']],
+    volumeRange: [-10, -4],
+    durations: ['16n', '8n', '4n']
+  },
+  'philosopher': {
+    scales: [['D4', 'F4', 'A4', 'D5'], ['F4', 'A4', 'D5', 'F5'], ['A4', 'D5', 'F5', 'A5']],
+    volumeRange: [-14, -8],
+    durations: ['4n', '2n']
+  },
+  'adult': {
+    scales: [['E4', 'G#4', 'B4', 'E5'], ['G#4', 'B4', 'E5', 'G#5'], ['B4', 'E5', 'G#5', 'B5']],
+    volumeRange: [-12, -6],
+    durations: ['8n', '4n']
+  },
+  'wanderer': {
+    scales: [['E4', 'G4', 'B4', 'E5'], ['G4', 'B4', 'E5', 'G5'], ['B4', 'E5', 'G5', 'B5']],
+    volumeRange: [-16, -10],
+    durations: ['16n', '8n']
+  },
+  'artist': {
+    scales: [['A4', 'C5', 'E5', 'A5'], ['C5', 'E5', 'A5', 'C6'], ['E5', 'A5', 'C6', 'E6']],
+    volumeRange: [-20, -14],
+    durations: ['8n', '4n', '2n']
   }
+};
 
-  // Event listener for the button
-  document.getElementById('sound').addEventListener('click', function() {
-    playSound();
+document.querySelectorAll('#buttons-container button').forEach(button => {
+  button.addEventListener('click', function() {
+    const lifeStage = this.id;
+    const { scales, volumeRange, durations } = lifeStageScales[lifeStage];
+    
+    const scale = scales[Math.floor(Math.random() * scales.length)];
+    const duration = durations[Math.floor(Math.random() * durations.length)];
+    const volume = Math.random() * (volumeRange[0] - volumeRange[1]) + volumeRange[1];
+
+    const synth = new Tone.PolySynth(Tone.Synth, {
+      volume: volume
+    }).toDestination();
+
+    scale.forEach((note, index) => {
+      synth.triggerAttackRelease(note, duration, Tone.now() + index * Tone.Time("8n").toSeconds());
+    });
   });
+});
 </script>
 
 </body>
 </html>
+
