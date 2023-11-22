@@ -20,132 +20,29 @@
             font-size: 16px;
             cursor: pointer;
         }
-        #particle-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            pointer-events: none; /* Prevents particles from blocking button clicks */
-            z-index: -1; /* Sends particles behind the content */
-        }
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.7;
-            box-shadow: 0 0 8px 4px #9c9;
-            pointer-events: none; /* Ensures clicks pass through the particles */
-            animation: floatParticle 2s linear forwards;
-        }
-        @keyframes floatParticle {
-            0% { transform: translateY(0); opacity: 0.7; }
-            100% { transform: translateY(-300px); opacity: 0; }
-        }
     </style>
 </head>
 <body>
 
 <div id="buttons-container">
-    <button id="child">Child</button>
-    <button id="lover">Lover</button>
-    <button id="partner">Partner</button>
-    <button id="philosopher">Philosopher</button>
-    <button id="adult">Adult</button>
-    <button id="wanderer">Wanderer</button>
-    <button id="artist">Artist</button>
+    <button id="sound">Play Sound</button>
 </div>
-<div id="particle-container"></div>
 
 <script>
-document.documentElement.addEventListener('mousedown', async () => {
+  document.documentElement.addEventListener('mousedown', async () => {
     await Tone.start();
-    console.log('Playback started successfully');
-});
+    console.log('Audio context activated');
+  });
 
-const lifeStageScales = {
-    // Life stage definitions as previously listed
-    // ...
-};
-
- function createParticle(x, y) {
-    const particleContainer = document.getElementById('particle-container');
-    const particle = document.createElement('div');
-    particle.classList.add('particle');
-    particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
-    const size = Math.random() * 10 + 5; // Size between 5px and 15px
-    particle.style.width = `${size}px`;
-    particle.style.height = `${size}px`;
-    particle.style.top = `${y - size / 2}px`;
-    particle.style.left = `${x - size / 2}px`;
-
-    particle.addEventListener('animationend', () => {
-      particleContainer.removeChild(particle);
-    });
-
-    particleContainer.appendChild(particle);
+  // Simple function to play a C4 note for testing purposes
+  function playSound() {
+    const synth = new Tone.Synth().toDestination();
+    synth.triggerAttackRelease("C4", "8n");
   }
 
-
-  // Define the configurations for life stage sounds
-  const lifeStageScales = {
-    'child': {
-      scales: [['C4', 'E4', 'G4', 'C5'], ['E4', 'G4', 'C5', 'E5'], ['G4', 'C5', 'E5', 'G5']],
-      volumeRange: [-12, -6],
-      durations: ['8n', '4n']
-    },
-    'lover': {
-      scales: [['C4', 'Eb4', 'G4', 'Bb4'], ['Eb4', 'G4', 'Bb4', 'C5'], ['G4', 'Bb4', 'C5', 'Eb5']],
-      volumeRange: [-18, -12],
-      durations: ['8n', '4n', '2n']
-    },
-    'partner': {
-      scales: [['D4', 'F#4', 'A4', 'D5'], ['F#4', 'A4', 'D5', 'F#5'], ['A4', 'D5', 'F#5', 'A5']],
-      volumeRange: [-10, -4],
-      durations: ['16n', '8n', '4n'] },
-      
-    'philosopher': {
-      scales: [['D4', 'F4', 'A4', 'D5'], ['F4', 'A4', 'D5', 'F5'], ['A4', 'D5', 'F5', 'A5']],
-      volumeRange: [-14, -8],
-      durations: ['4n', '2n']
-    },
-    'adult': {
-      scales: [['E4', 'G#4', 'B4', 'E5'], ['G#4', 'B4', 'E5', 'G#5'], ['B4', 'E5', 'G#5', 'B5']],
-      volumeRange: [-12, -6],
-      durations: ['8n', '4n']
-    },
-    'wanderer': {
-      scales: [['E4', 'G4', 'B4', 'E5'], ['G4', 'B4', 'E5', 'G5'], ['B4', 'E5', 'G5', 'B5']],
-      volumeRange: [-16, -10],
-      durations: ['16n', '8n']
-    },
-    'artist': {
-      scales: [['A4', 'C5', 'E5', 'A5'], ['C5', 'E5', 'A5', 'C6'], ['E5', 'A5', 'C6', 'E6']],
-      volumeRange: [-20, -14],
-      durations: ['8n', '4n', '2n']
-    }
-  }; function playQuantumSound(lifeStage, event) {
-    const { scales, volumeRange, durations } = lifeStageScales[lifeStage];
-    const scale = scales[Math.floor(Math.random() * scales.length)];
-    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-    const volume = Math.random() * (volumeRange[1] - volumeRange[0]) + volumeRange[0];
-    synth.volume.value = volume;
-    
-    scale.forEach((note, index) => {
-      const duration = durations[Math.floor(Math.random() * durations.length)];
-      synth.triggerAttackRelease(note, duration, Tone.now() + index * 0.25);
-    });
-
-    // Create particle effect on sound play
-    const rect = event.target.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    createParticle(x, y);
-  }
-     document.querySelectorAll('#buttons-container button').forEach(button => {
-     button.addEventListener('click', function(event) {
-        playQuantumSound(this.id, event);
-    });
+  // Event listener for the button
+  document.getElementById('sound').addEventListener('click', function() {
+    playSound();
   });
 </script>
 
