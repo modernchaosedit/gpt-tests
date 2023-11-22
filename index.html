@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quantum Sound Experience Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Quantum Sound Experience Generator</h1>
+    <div id="buttons-container">
+        <button onclick="playLifeStageSound('child')">Child</button>
+        <button onclick="playLifeStageSound('lover')">Lover</button>
+        <button onclick="playLifeStageSound('partner')">Partner</button>
+        <button onclick="playLifeStageSound('philosopher')">Philosopher</button>
+        <button onclick="playLifeStageSound('adult')">Adult</button>
+        <button onclick="playLifeStageSound('wanderer')">Wanderer</button>
+        <button onclick="playLifeStageSound('artist')">Artist</button>
+    </div>
+
+    <script>
+        // Define a function to play the mapped sound for each life stage
+        async function playLifeStageSound(lifeStage) {
+            // Ensure audio context is in a running state
+            await Tone.start();
+
+            let synth;
+
+            // Map life stages to musical elements
+            const lifeStageSounds = {
+                'child': {
+                    scale: ['C4', 'D4', 'E4', 'G4', 'A4'],
+                    options: { oscillator: { type: 'sine' }, volume: -12 }
+                },
+                'lover': {
+                    note: 'C4',
+                    options: { oscillator: { type: 'triangle' }, volume: -20 }
+                },
+                'partner': {
+                    note: 'D4',
+                    options: { oscillator: { type: 'square' }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.5, release: 0.5 }, volume: -8 }
+                },
+                'philosopher': {
+                    note: 'D3',
+                    options: { oscillator: { type: 'sine' }, volume: -5 },
+                    effect: 'pingPongDelay'
+                },
+                'adult': {
+                    scale: ['E4', 'G#4', 'B4'],
+                    options: { oscillator: { type: 'fm' }, volume: -8 }
+                },
+                'wanderer': {
+                    scale: ['E4', 'F#4', 'G4', 'A4'],
+                    options: { oscillator: { type: 'am' }, volume: -10 }
+                },
+                'artist': {
+                    scale: ['A3', 'C4', 'E4', 'G4', 'A4'],
+                    options: { oscillator: { type: 'fmsquare' }, volume: -10 }
+                }
+            };
+
+            const currentStage = lifeStageSounds[lifeStage];
+
+            // Handle special cases for life stages with effects
+            if (currentStage.effect === 'pingPongDelay') {
+                const delay = new Tone.PingPongDelay('4n', 0.2).toDestination();
+                synth = new Tone.Synth(currentStage.options).connect(delay);
+            } else {
+                synth = new Tone.Synth(currentStage.options).toDestination();
+            }
+
+            // Play a scale or a single note
+            if (currentStage.scale) {
+                synth.triggerAttackRelease(currentStage.scale, '4n');
+            } else {
+                synth.triggerAttackRelease(currentStage.note, '1n');
+            }
+        }
+    </script>
+
+</body>
+</html>
