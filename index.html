@@ -20,6 +20,36 @@
             font-size: 16px;
             cursor: pointer;
         }
+
+        /* Quantum visualization styles */
+#visualization-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allow clicks to pass through */
+    z-index: 0; /* Behind buttons but above background */
+}
+
+.quanta {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid #fff;
+    animation: quantumEffect 4s infinite ease-in-out;
+}
+
+@keyframes quantumEffect {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+        
     </style>
 </head>
 <body>
@@ -34,6 +64,8 @@
     <button id="artist">Artist</button>
 </div>
 
+    <div id="visualization-container"></div>
+    
 <script>
   // Start the audio context after user interaction
   document.documentElement.addEventListener('mousedown', async () => {
@@ -96,6 +128,34 @@ document.querySelectorAll('#buttons-container button').forEach(button => {
     });
   });
 });
+
+    // Put this at the end of your <script> section
+function createQuantaEffect() {
+  const visualizationContainer = document.getElementById('visualization-container');
+  const quanta = document.createElement('div');
+  quanta.classList.add('quanta');
+  
+  quanta.style.width = '100px';
+  quanta.style.height = '100px';
+  quanta.style.top = '50%';
+  quanta.style.left = '50%';
+  quanta.style.marginTop = '-50px'; // offset for width/2
+  quanta.style.marginLeft = '-50px'; // offset for height/2
+
+  visualizationContainer.appendChild(quanta);
+
+  setTimeout(() => {
+    visualizationContainer.removeChild(quanta);
+  }, 4000); // Clean up after the animation is complete
+}
+
+// If you want the visualization effect to occur whenever a sound is played
+document.querySelectorAll('#buttons-container button').forEach(button => {
+  button.addEventListener('click', function() {
+    createQuantaEffect();
+  });
+});
+    
 </script>
 
 </body>
