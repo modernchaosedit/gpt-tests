@@ -4,22 +4,19 @@
     <meta charset="UTF-8">
     <title>Quantum Sound Experience Generator</title>
     <script src="https://cdn.jsdelivr.net/npm/tone@14"></script>
-    <!-- Add your existing styles here, and then include the following CSS -->
     <style>
-        body {
+        body, html {
+            height: 100%;
             margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            flex-direction: column;
-            background-color: #f0f0f0;
             font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
         }
-        button {
-            padding: 10px 20px;
+        #buttons-container button {
             margin: 5px;
+            padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
         }
@@ -30,14 +27,15 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            z-index: -1; /* Send particles to the back */
+            pointer-events: none;
+            z-index: -1;
         }
         .particle {
             position: absolute;
             border-radius: 50%;
             opacity: 0.7;
             box-shadow: 0 0 8px 4px #9c9;
-            pointer-events: none; /* Ensures clicks pass through the particles */
+            pointer-events: none;
             animation: floatParticle 2s linear forwards;
         }
         @keyframes floatParticle {
@@ -48,98 +46,75 @@
 </head>
 <body>
 
-<h1>Quantum Sound Experience Generator</h1>
 <div id="buttons-container">
     <button id="child">Child</button>
     <button id="lover">Lover</button>
-    <button id="partner">Partner</button>
-    <button id="philosopher">Philosopher</button>
-    <button id="adult">Adult</button>
-    <button id="wanderer">Wanderer</button>
-    <button id="artist">Artist</button>
+    <!-- Add more buttons as needed for the life stages -->
 </div>
 <div id="particle-container"></div>
 
 <script>
-  // Function to generate particles on the screen
+  // Define a function to create and animate particles
   function createParticle(x, y) {
+    const particleContainer = document.getElementById('particle-container');
     const particle = document.createElement('div');
     particle.classList.add('particle');
-    particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
-    const size = Math.random() * 10 + 5;
+    particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`; // Random color
+    const size = Math.random() * 10 + 5; // Random size between 5px and 15px
     particle.style.width = `${size}px`;
     particle.style.height = `${size}px`;
     particle.style.top = `${y - size / 2}px`;
     particle.style.left = `${x - size / 2}px`;
-    document.getElementById('particle-container').appendChild(particle);
 
-    setTimeout(() => {
-      document.getElementById('particle-container').removeChild(particle);
-    }, 2000);
+    // Remove particle after animation ends
+    particle.addEventListener('animationend', () => {
+      particleContainer.removeChild(particle);
+    });
+
+    particleContainer.appendChild(particle);
   }
 
-  // Function to play a sound and create particles
+  // Define a function to play sounds and create particles
   function playQuantumSoundAndParticles(lifeStage, event) {
-    // Your existing playQuantumSound function code here
-    // ...
-
-      <script>
-  // Start the audio context on a user gesture
-  document.documentElement.addEventListener('mousedown', () => {
-    Tone.start();
-  });
-  
-  // Function to play sounds with 'quantum randomness'
-  function playQuantumSound(lifeStage) {
     // Define scale sets for different life stages
     const lifeStageScales = {
-      'child': {
-        scales: [['C4', 'E4', 'G4', 'C5'], ['E4', 'G4', 'C5', 'E5'], ['G4', 'C5', 'E5', 'G5']],
-        volumeRange: [-12, -6],
-        duration: ['8n', '4n']
-      },
-      'lover': {
-        scales: [['C4', 'Eb4', 'G4', 'C5'], ['Eb4', 'G4', 'C5', 'Eb5'], ['G4', 'C5', 'Eb5', 'G5']],
-        volumeRange: [-18, -12],
-        duration: ['8n', '4n', '2n']
-      },
-      // ...more life stages...
+      // [...]
+      // Your life stage scales go here
+      // Each life stage should have an array of scale arrays, volumeRange, and duration
+      // [...]
     };
 
-    const stage = lifeStageScales[lifeStage];
+    // Get the lifeStage scales, volume range, and duration
+    const { scales, volumeRange, duration } = lifeStageScales[lifeStage];
 
     // Choose a scale randomly
-    const scaleSet = stage.scales[Math.floor(Math.random() * stage.scales.length)];
+    const scaleSet = scales[Math.floor(Math.random() * scales.length)];
 
-    // Create a synth and connect it to the main output (your speakers)
+    // Create a synth
     const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-    
-    // Define a random volume within the range
-    const volume = Math.random() * (stage.volumeRange[0] - stage.volumeRange[1]) + stage.volumeRange[1];
+
+    // Randomize the volume
+    const volume = Math.random() * (volumeRange[1] - volumeRange[0]) + volumeRange[0];
     synth.volume.value = volume;
 
-    // Play each note of the chosen scale in succession
+    // Play the notes of the chosen scale
     scaleSet.forEach((note, index) => {
-      const time = index * 0.25;
-      const duration = stage.duration[Math.floor(Math.random() * stage.duration.length)];
-      synth.triggerAttackRelease(note, duration, Tone.now() + time);
+      const time = Tone.now() + index * 0.25;
+      const noteDuration = duration[Math.floor(Math.random() * duration.length)];
+      synth.triggerAttackRelease(note, noteDuration, time);
     });
-  }
-
-  // Add event listeners to the buttons
-  const buttons = document.querySelectorAll('button');
-  buttons.forEach(button => {
-    button.addEventListener('click', function() {
-      playQuantumSound(this.id);
-    });
-  });
-
 
     // Create a particle at the click location
     createParticle(event.clientX, event.clientY);
   }
 
-  document.querySelectorAll('button').forEach(button => {
+  // Start audio context on user interaction
+  document.documentElement.addEventListener('mousedown', () => {
+    Tone.start();
+  });
+
+  // Add event listener to buttons
+  document.querySelectorAll('#buttons-container button').forEach(button => {
     button.addEventListener('click', function(event) {
       playQuantumSoundAndParticles(this.id, event);
     });
