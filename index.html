@@ -41,95 +41,56 @@
         <button onclick="playLifeStageSound('wanderer')">Wanderer</button>
         <button onclick="playLifeStageSound('artist')">Artist</button>
     </div>
-
-   <script>
-    // Ensure the audio context is started when interaction begins
-    async function startAudio() {
-        await Tone.start();
-        console.log('Audio is ready');
-    }
-
-    // Bind the event to start audio context
-    document.documentElement.addEventListener('mousedown', startAudio);
-    document.documentElement.addEventListener('touchend', startAudio); // For touch devices
-
-    // Function to play arpeggiated scales
-    function playArpeggio(scale, octaves, style) {
-        const synth = new Tone.PolySynth(Tone.Synth, {
-            envelope: {
-                attack: 0.1,
-                decay: 0.2,
-                sustain: 0.3,
-                release: 0.8
-            }
-        }).toDestination();
-
-        // Styles determine the speed of the arpeggio
-        const noteDuration = style === 'fast' ? '16n' : '4n';
-
-        // Create an array with notes for octave spreading
-        let fullScale = [];
-        for (let o = 0; o < octaves; o++) {
-            for (let i = 0; i < scale.length; i++) {
-                fullScale.push(scale[i] + (4 + o)); // Starting at the fourth octave
-            }
-        }
-
-        // Play the arpeggio with timing based on the style
-        let time = 0;
-        fullScale.forEach(note => {
-            synth.triggerAttackRelease(note, noteDuration, Tone.now() + time);
-            time += Tone.Time(noteDuration).toSeconds() * (style === 'fast' ? 0.5 : 1);
-        });
-    }
-
-    // Define life stage sounds with corresponding musical elements
-    const lifeStageSounds = {
-        'child': {
-            scale: ['C', 'E', 'G'],
-            octaves: 2,
-            style: 'fast'
-        },
-        'lover': {
-            scale: ['C', 'Eb', 'G'],
-            octaves: 2,
-            style: 'slow'
-        },
-        'partner': {
-            scale: ['D', 'F#', 'A'],
-            octaves: 2,
-            style: 'medium'
-        },
-        'philosopher': {
-            scale: ['D', 'F', 'A'],
-            octaves: 2,
-            style: 'slow'
-        },
-        'adult': {
-            scale: ['E', 'G#', 'B'],
-            octaves: 2,
-            style: 'medium'
-        },
-        'wanderer': {
-            scale: ['E', 'G', 'B'],
-            octaves: 2,
-            style: 'fast'
-        },
-        'artist': {
-            scale: ['A', 'C', 'E'],
-            octaves: 2,
-            style: 'slow'
-        }
+<script>
+  // Start the audio context on a user gesture
+  document.documentElement.addEventListener('mousedown', () => {
+    Tone.start();
+  });
+  
+  // Function to play sounds with 'quantum randomness'
+  function playQuantumSound(lifeStage) {
+    // Define scale sets for different life stages
+    const lifeStageScales = {
+      'child': {
+        scales: [['C4', 'E4', 'G4', 'C5'], ['E4', 'G4', 'C5', 'E5'], ['G4', 'C5', 'E5', 'G5']],
+        volumeRange: [-12, -6],
+        duration: ['8n', '4n']
+      },
+      'lover': {
+        scales: [['C4', 'Eb4', 'G4', 'C5'], ['Eb4', 'G4', 'C5', 'Eb5'], ['G4', 'C5', 'Eb5', 'G5']],
+        volumeRange: [-18, -12],
+        duration: ['8n', '4n', '2n']
+      },
+      // ...more life stages...
     };
 
-    // Event listener for button clicks that triggers playing of sounds
-    document.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const lifeStage = this.id;
-            const { scale, octaves, style } = lifeStageSounds[lifeStage];
-            playArpeggio(scale, octaves, style);
-        });
+    const stage = lifeStageScales[lifeStage];
+
+    // Choose a scale randomly
+    const scaleSet = stage.scales[Math.floor(Math.random() * stage.scales.length)];
+
+    // Create a synth and connect it to the main output (your speakers)
+    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+    
+    // Define a random volume within the range
+    const volume = Math.random() * (stage.volumeRange[0] - stage.volumeRange[1]) + stage.volumeRange[1];
+    synth.volume.value = volume;
+
+    // Play each note of the chosen scale in succession
+    scaleSet.forEach((note, index) => {
+      const time = index * 0.25;
+      const duration = stage.duration[Math.floor(Math.random() * stage.duration.length)];
+      synth.triggerAttackRelease(note, duration, Tone.now() + time);
     });
+  }
+
+  // Add event listeners to the buttons
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(button => {
+    button.addEventListener('click', function() {
+      playQuantumSound(this.id);
+    });
+  });
 </script>
 
 </body>
