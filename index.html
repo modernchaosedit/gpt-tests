@@ -83,6 +83,58 @@
     // Your existing playQuantumSound function code here
     // ...
 
+      <script>
+  // Start the audio context on a user gesture
+  document.documentElement.addEventListener('mousedown', () => {
+    Tone.start();
+  });
+  
+  // Function to play sounds with 'quantum randomness'
+  function playQuantumSound(lifeStage) {
+    // Define scale sets for different life stages
+    const lifeStageScales = {
+      'child': {
+        scales: [['C4', 'E4', 'G4', 'C5'], ['E4', 'G4', 'C5', 'E5'], ['G4', 'C5', 'E5', 'G5']],
+        volumeRange: [-12, -6],
+        duration: ['8n', '4n']
+      },
+      'lover': {
+        scales: [['C4', 'Eb4', 'G4', 'C5'], ['Eb4', 'G4', 'C5', 'Eb5'], ['G4', 'C5', 'Eb5', 'G5']],
+        volumeRange: [-18, -12],
+        duration: ['8n', '4n', '2n']
+      },
+      // ...more life stages...
+    };
+
+    const stage = lifeStageScales[lifeStage];
+
+    // Choose a scale randomly
+    const scaleSet = stage.scales[Math.floor(Math.random() * stage.scales.length)];
+
+    // Create a synth and connect it to the main output (your speakers)
+    const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+    
+    // Define a random volume within the range
+    const volume = Math.random() * (stage.volumeRange[0] - stage.volumeRange[1]) + stage.volumeRange[1];
+    synth.volume.value = volume;
+
+    // Play each note of the chosen scale in succession
+    scaleSet.forEach((note, index) => {
+      const time = index * 0.25;
+      const duration = stage.duration[Math.floor(Math.random() * stage.duration.length)];
+      synth.triggerAttackRelease(note, duration, Tone.now() + time);
+    });
+  }
+
+  // Add event listeners to the buttons
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach(button => {
+    button.addEventListener('click', function() {
+      playQuantumSound(this.id);
+    });
+  });
+
+
     // Create a particle at the click location
     createParticle(event.clientX, event.clientY);
   }
