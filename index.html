@@ -42,65 +42,95 @@
         <button onclick="playLifeStageSound('artist')">Artist</button>
     </div>
 
-    <script>
-        // Define a function to play the mapped sound for each life stage
-        async function playLifeStageSound(lifeStage) {
-            // Ensure audio context is in a running state
-            await Tone.start();
+   <script>
+    // Ensure the audio context is started when interaction begins
+    async function startAudio() {
+        await Tone.start();
+        console.log('Audio is ready');
+    }
 
-            let synth;
+    // Bind the event to start audio context
+    document.documentElement.addEventListener('mousedown', startAudio);
+    document.documentElement.addEventListener('touchend', startAudio); // For touch devices
 
-            // Map life stages to musical elements
-            const lifeStageSounds = {
-                'child': {
-                    scale: ['C4', 'D4', 'E4', 'G4', 'A4'],
-                    options: { oscillator: { type: 'sine' }, volume: -12 }
-                },
-                'lover': {
-                    note: 'C4',
-                    options: { oscillator: { type: 'triangle' }, volume: -20 }
-                },
-                'partner': {
-                    note: 'D4',
-                    options: { oscillator: { type: 'square' }, envelope: { attack: 0.05, decay: 0.2, sustain: 0.5, release: 0.5 }, volume: -8 }
-                },
-                'philosopher': {
-                    note: 'D3',
-                    options: { oscillator: { type: 'sine' }, volume: -5 },
-                    effect: 'pingPongDelay'
-                },
-                'adult': {
-                    scale: ['E4', 'G#4', 'B4'],
-                    options: { oscillator: { type: 'fm' }, volume: -8 }
-                },
-                'wanderer': {
-                    scale: ['E4', 'F#4', 'G4', 'A4'],
-                    options: { oscillator: { type: 'am' }, volume: -10 }
-                },
-                'artist': {
-                    scale: ['A3', 'C4', 'E4', 'G4', 'A4'],
-                    options: { oscillator: { type: 'fmsquare' }, volume: -10 }
-                }
-            };
-
-            const currentStage = lifeStageSounds[lifeStage];
-
-            // Handle special cases for life stages with effects
-            if (currentStage.effect === 'pingPongDelay') {
-                const delay = new Tone.PingPongDelay('4n', 0.2).toDestination();
-                synth = new Tone.Synth(currentStage.options).connect(delay);
-            } else {
-                synth = new Tone.Synth(currentStage.options).toDestination();
+    // Function to play arpeggiated scales
+    function playArpeggio(scale, octaves, style) {
+        const synth = new Tone.PolySynth(Tone.Synth, {
+            envelope: {
+                attack: 0.1,
+                decay: 0.2,
+                sustain: 0.3,
+                release: 0.8
             }
+        }).toDestination();
 
-            // Play a scale or a single note
-            if (currentStage.scale) {
-                synth.triggerAttackRelease(currentStage.scale, '4n');
-            } else {
-                synth.triggerAttackRelease(currentStage.note, '1n');
+        // Styles determine the speed of the arpeggio
+        const noteDuration = style === 'fast' ? '16n' : '4n';
+
+        // Create an array with notes for octave spreading
+        let fullScale = [];
+        for (let o = 0; o < octaves; o++) {
+            for (let i = 0; i < scale.length; i++) {
+                fullScale.push(scale[i] + (4 + o)); // Starting at the fourth octave
             }
         }
-    </script>
+
+        // Play the arpeggio with timing based on the style
+        let time = 0;
+        fullScale.forEach(note => {
+            synth.triggerAttackRelease(note, noteDuration, Tone.now() + time);
+            time += Tone.Time(noteDuration).toSeconds() * (style === 'fast' ? 0.5 : 1);
+        });
+    }
+
+    // Define life stage sounds with corresponding musical elements
+    const lifeStageSounds = {
+        'child': {
+            scale: ['C', 'E', 'G'],
+            octaves: 2,
+            style: 'fast'
+        },
+        'lover': {
+            scale: ['C', 'Eb', 'G'],
+            octaves: 2,
+            style: 'slow'
+        },
+        'partner': {
+            scale: ['D', 'F#', 'A'],
+            octaves: 2,
+            style: 'medium'
+        },
+        'philosopher': {
+            scale: ['D', 'F', 'A'],
+            octaves: 2,
+            style: 'slow'
+        },
+        'adult': {
+            scale: ['E', 'G#', 'B'],
+            octaves: 2,
+            style: 'medium'
+        },
+        'wanderer': {
+            scale: ['E', 'G', 'B'],
+            octaves: 2,
+            style: 'fast'
+        },
+        'artist': {
+            scale: ['A', 'C', 'E'],
+            octaves: 2,
+            style: 'slow'
+        }
+    };
+
+    // Event listener for button clicks that triggers playing of sounds
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const lifeStage = this.id;
+            const { scale, octaves, style } = lifeStageSounds[lifeStage];
+            playArpeggio(scale, octaves, style);
+        });
+    });
+</script>
 
 </body>
 </html>
