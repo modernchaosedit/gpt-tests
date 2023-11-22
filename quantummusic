@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quantum Sound Experience Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Quantum Sound Experience Generator</h1>
+    <div id="buttons-container">
+        <button id="child">Child</button>
+        <button id="lover">Lover</button>
+        <button id="partner">Partner</button>
+        <button id="philosopher">Philosopher</button>
+        <button id="adult">Adult</button>
+        <button id="wanderer">Wanderer</button>
+        <button id="artist">Artist</button>
+    </div>
+
+    <script>
+        async function playLifeStageSound(lifeStage) {
+            await Tone.start();
+            let synth;
+
+            switch (lifeStage) {
+                case 'child':
+                    synth = new Tone.PolySynth(Tone.Synth, {
+                        volume: -12,
+                        oscillator: {
+                            type: 'sine'
+                        }
+                    }).toDestination();
+                    synth.triggerAttackRelease(["C5", "E5", "G5"], "1n");
+                    break;
+
+                case 'lover':
+                    synth = new Tone.Synth({
+                        oscillator: { type: 'sine' },
+                        volume: -20
+                    }).toDestination();
+                    synth.triggerAttackRelease('C4', '2n');
+                    break;
+
+                case 'partner':
+                    synth = new Tone.MembraneSynth().toDestination();
+                    synth.triggerAttackRelease('D4', '8n');
+                    break;
+
+                case 'philosopher':
+                    synth = new Tone.MetalSynth({
+                        frequency: 200,
+                        envelope: { decay: 1.5 },
+                        harmonicity: 5.1,
+                        modulationIndex: 32,
+                        resonance: 4000,
+                        octaves: 1.5
+                    }).toDestination();
+                    synth.triggerAttackRelease('D2', '2n');
+                    break;
+
+                case 'adult':
+                    synth = new Tone.AMSynth().toDestination();
+                    synth.triggerAttackRelease('E4', '1n');
+                    break;
+
+                case 'wanderer':
+                    synth = new Tone.FMSynth().toDestination();
+                    synth.triggerAttackRelease(["E4", "A4"], '1n');
+                    break;
+
+                case 'artist':
+                    synth = new Tone.FMSynth({
+                        harmonicity: 3.01,
+                        modulationIndex: 14,
+                        oscillator: { type: "triangle" },
+                        envelope: { attack: 0.2, decay: 0.3, sustain: 0.9, release: 1.2 },
+                        modulation: { type: "square" },
+                        modulationEnvelope: { attack: 0.01, decay: 0.5, sustain: 0.2, release: 0.1 }
+                    }).toDestination();
+                    synth.triggerAttackRelease('A4', '1m');
+                    break;
+
+                default:
+                    console.log('Unknown life stage sound requested.');
+            }
+        }
+
+        // Attach click event listeners to buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                playLifeStageSound(e.target.id);
+            });
+        });
