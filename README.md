@@ -1,1 +1,1 @@
-# gpt-tests are code bases i have created entirely based on prompting Chat GPt
+# this is code written with chatgpt to make a musical experiment
